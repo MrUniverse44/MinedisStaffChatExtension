@@ -1,7 +1,5 @@
 package me.blueslime.minedis.extension;
 
-import me.blueslime.minedis.Minedis;
-import me.blueslime.minedis.api.MinedisAPI;
 import me.blueslime.minedis.api.extension.MinedisExtension;
 import me.blueslime.minedis.extension.cache.StaffCache;
 import me.blueslime.minedis.extension.commands.StaffChatCommand;
@@ -10,7 +8,6 @@ import me.blueslime.minedis.extension.listeners.player.PlayerChatListener;
 import me.blueslime.minedis.extension.listeners.player.PlayerJoinListener;
 import me.blueslime.minedis.extension.listeners.player.PlayerQuitListener;
 import me.blueslime.minedis.extension.utils.ColorUtils;
-import me.blueslime.minedis.modules.discord.Controller;
 import me.blueslime.minedis.utils.text.TextUtilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -31,15 +28,11 @@ public final class MStaffChat extends MinedisExtension {
     public String getName() {
         return "Minedis StaffChat";
     }
-    private DiscordChatListener discordChatListener;
-    private PlayerQuitListener quitListener;
-    private PlayerJoinListener joinListener;
-    private PlayerChatListener listener;
-
     private EmbedTemplate template;
 
     @Override
     public void onEnabled() {
+        getPlugin().getLogger().info("Loading StaffChat Extension");
         if (!getConfiguration().contains("settings.channel-id")) {
             getConfiguration().set("settings.channel-id", "NOT_SET");
         }
@@ -90,69 +83,45 @@ public final class MStaffChat extends MinedisExtension {
         if (!getConfiguration().contains("settings.hooks.MStaffAuthenticator")) {
             getConfiguration().set("settings.hooks.MStaffAuthenticator", false);
         }
+
         saveConfiguration();
 
-        discordChatListener = new DiscordChatListener(this);
-        quitListener = new PlayerQuitListener(this);
-        joinListener = new PlayerJoinListener(this);
-        listener = new PlayerChatListener(this);
+        registerMinecraftListeners(
+            new PlayerQuitListener(this),
+            new PlayerJoinListener(this),
+            new PlayerChatListener(this)
+        );
 
-        Minedis plugin = MinedisAPI.get().getPlugin();
+        registerEventListeners(
+            new DiscordChatListener(this)
+        );
 
-        plugin.getCacheMap().put(
-                StaffCache.class,
-                cache
+        registerCache(
+            cache
         );
 
         template = new EmbedTemplate(
-                getConfiguration().getString("settings.formats.discord.with-embed.title", "SpigotMC"),
-                getConfiguration().getString("settings.formats.discord.with-embed.description", "(%location% %nick%): %message%"),
-                getConfiguration().getString("settings.formats.discord.with-embed.footer", "mc.spigotmc.org"),
-                getConfiguration().getString("settings.formats.discord.with-embed.color", "YELLOW")
+            getConfiguration().getString("settings.formats.discord.with-embed.title", "SpigotMC"),
+            getConfiguration().getString("settings.formats.discord.with-embed.description", "(%location% %nick%): %message%"),
+            getConfiguration().getString("settings.formats.discord.with-embed.footer", "mc.spigotmc.org"),
+            getConfiguration().getString("settings.formats.discord.with-embed.color", "YELLOW")
         );
 
         registerMinecraftCommand(
-                new StaffChatCommand(
-                        this,
-                        getConfiguration().getString("settings.command.value", "sc")
-                )
+            new StaffChatCommand(
+                this,
+                getConfiguration().getString("settings.command.value", "sc")
+            )
         );
 
-        plugin.getModule(Controller.class).getBot().getClient().addEventListener(discordChatListener);
-
-        plugin.getProxy().getPluginManager().registerListener(
-            plugin,
-            quitListener
-        );
-        plugin.getProxy().getPluginManager().registerListener(
-            plugin,
-            joinListener
-        );
-        plugin.getProxy().getPluginManager().registerListener(
-            plugin,
-            listener
-        );
+        getLogger().info("All listeners are loaded from MStaffChat");
     }
 
     @Override
     public void onDisable() {
-        Minedis plugin = MinedisAPI.get().getPlugin();
+        getLogger().info("All listeners are unloaded from MStaffChat");
 
-        plugin.getProxy().getPluginManager().unregisterListener(
-                listener
-        );
-        plugin.getProxy().getPluginManager().unregisterListener(
-                joinListener
-        );
-        plugin.getProxy().getPluginManager().unregisterListener(
-                quitListener
-        );
-        plugin.getModule(Controller.class).getBot().getClient().removeEventListener(discordChatListener);
-
-        discordChatListener = null;
-        quitListener = null;
         template = null;
-        listener = null;
     }
 
     public boolean isEmbed() {
@@ -179,10 +148,10 @@ public final class MStaffChat extends MinedisExtension {
 
         public EmbedTemplate(String title, String description, String footer, String color) {
             this(
-                    title,
-                    description,
-                    footer,
-                    ColorUtils.getColor(color)
+                title,
+                description,
+                footer,
+                ColorUtils.getColor(color)
             );
         }
 
@@ -203,10 +172,11 @@ public final class MStaffChat extends MinedisExtension {
         }
 
         public MessageEmbed build(MStaffChat chat, ProxiedPlayer player, String message) {
-            String server = chat.getConfiguration().contains("server-name." + player.getServer().getInfo().getName()) ?
-                    chat.getConfiguration().getString(
-                            "server-name." + player.getServer().getInfo().getName(), player.getServer().getInfo().getName()
-                    ) : player.getServer().getInfo().getName();
+            String server = chat.getConfiguration().contains("server-name." + player.getServer().getInfo().getName())
+                ? chat.getConfiguration().getString(
+                    "server-name." + player.getServer().getInfo().getName(),
+                    player.getServer().getInfo().getName())
+                : player.getServer().getInfo().getName();
 
             return new EmbedBuilder().setTitle(
                 getTitle().replace(
@@ -227,7 +197,7 @@ public final class MStaffChat extends MinedisExtension {
                         "%message%", TextUtilities.strip(message)
                 )
             ).setColor(
-                    getColor()
+                getColor()
             ).setFooter(
                 getFooter().replace(
                         "%player%", player.getName()
@@ -277,19 +247,5 @@ public final class MStaffChat extends MinedisExtension {
                     event.getMessage()
             );
         }
-    }
-
-    @SuppressWarnings("unused")
-    public PlayerChatListener getListener() {
-        return listener;
-    }
-
-    @SuppressWarnings("unused")
-    public PlayerQuitListener getQuitListener() {
-        return quitListener;
-    }
-
-    public Minedis getPlugin() {
-        return MinedisAPI.get().getPlugin();
     }
 }
