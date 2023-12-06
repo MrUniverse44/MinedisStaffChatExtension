@@ -4,6 +4,7 @@ import me.blueslime.minedis.Minedis;
 import me.blueslime.minedis.api.MinedisAPI;
 import me.blueslime.minedis.api.extension.MinedisExtension;
 import me.blueslime.minedis.extension.cache.StaffCache;
+import me.blueslime.minedis.extension.commands.StaffChatCommand;
 import me.blueslime.minedis.extension.listeners.player.PlayerChatListener;
 import me.blueslime.minedis.extension.listeners.player.PlayerJoinListener;
 import me.blueslime.minedis.extension.listeners.player.PlayerQuitListener;
@@ -45,6 +46,9 @@ public final class MStaffChat extends MinedisExtension {
         }
         if (!getConfiguration().contains("settings.command.permission")) {
             getConfiguration().set("settings.command.permission", "minedis.staffchat.use");
+        }
+        if (!getConfiguration().contains("settings.command.value")) {
+            getConfiguration().set("settings.command.value", "sc");
         }
         if (!getConfiguration().contains("settings.formats.minecraft")) {
             getConfiguration().set("settings.formats.minecraft", "&4[&cStaff&4]&c&l %location% &f%nick% &8» &7%message%");
@@ -102,6 +106,13 @@ public final class MStaffChat extends MinedisExtension {
                 getConfiguration().getString("settings.formats.discord.with-embed.description", "(%location% %nick%): %message%"),
                 getConfiguration().getString("settings.formats.discord.with-embed.footer", "mc.spigotmc.org"),
                 getConfiguration().getString("settings.formats.discord.with-embed.color", "YELLOW")
+        );
+
+        registerMinecraftCommand(
+                new StaffChatCommand(
+                        this,
+                        getConfiguration().getString("settings.command.value", "sc")
+                )
         );
 
         plugin.getProxy().getPluginManager().registerListener(
