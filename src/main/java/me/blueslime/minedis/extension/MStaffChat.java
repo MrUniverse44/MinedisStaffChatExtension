@@ -5,10 +5,12 @@ import me.blueslime.minedis.api.MinedisAPI;
 import me.blueslime.minedis.api.extension.MinedisExtension;
 import me.blueslime.minedis.extension.cache.StaffCache;
 import me.blueslime.minedis.extension.commands.StaffChatCommand;
+import me.blueslime.minedis.extension.listeners.discord.DiscordChatListener;
 import me.blueslime.minedis.extension.listeners.player.PlayerChatListener;
 import me.blueslime.minedis.extension.listeners.player.PlayerJoinListener;
 import me.blueslime.minedis.extension.listeners.player.PlayerQuitListener;
 import me.blueslime.minedis.extension.utils.ColorUtils;
+import me.blueslime.minedis.modules.discord.Controller;
 import me.blueslime.minedis.utils.text.TextUtilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,7 +31,7 @@ public final class MStaffChat extends MinedisExtension {
     public String getName() {
         return "Minedis StaffChat";
     }
-
+    private DiscordChatListener discordChatListener;
     private PlayerQuitListener quitListener;
     private PlayerJoinListener joinListener;
     private PlayerChatListener listener;
@@ -90,6 +92,7 @@ public final class MStaffChat extends MinedisExtension {
         }
         saveConfiguration();
 
+        discordChatListener = new DiscordChatListener(this);
         quitListener = new PlayerQuitListener(this);
         joinListener = new PlayerJoinListener(this);
         listener = new PlayerChatListener(this);
@@ -115,6 +118,8 @@ public final class MStaffChat extends MinedisExtension {
                 )
         );
 
+        plugin.getModule(Controller.class).getBot().getClient().addEventListener(discordChatListener);
+
         plugin.getProxy().getPluginManager().registerListener(
             plugin,
             quitListener
@@ -131,16 +136,20 @@ public final class MStaffChat extends MinedisExtension {
 
     @Override
     public void onDisable() {
-        MinedisAPI.get().getPluginManager().unregisterListener(
+        Minedis plugin = MinedisAPI.get().getPlugin();
+
+        plugin.getProxy().getPluginManager().unregisterListener(
                 listener
         );
-        MinedisAPI.get().getPluginManager().unregisterListener(
+        plugin.getProxy().getPluginManager().unregisterListener(
                 joinListener
         );
-        MinedisAPI.get().getPluginManager().unregisterListener(
+        plugin.getProxy().getPluginManager().unregisterListener(
                 quitListener
         );
+        plugin.getModule(Controller.class).getBot().getClient().removeEventListener(discordChatListener);
 
+        discordChatListener = null;
         quitListener = null;
         template = null;
         listener = null;
@@ -270,10 +279,12 @@ public final class MStaffChat extends MinedisExtension {
         }
     }
 
+    @SuppressWarnings("unused")
     public PlayerChatListener getListener() {
         return listener;
     }
 
+    @SuppressWarnings("unused")
     public PlayerQuitListener getQuitListener() {
         return quitListener;
     }
