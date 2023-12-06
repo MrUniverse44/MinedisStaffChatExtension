@@ -63,7 +63,9 @@ public class PlayerChatListener implements Listener {
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
 
-        if (main.getCache(StaffCache.class).contains(player.getUniqueId())) {
+        StaffCache cache = main.getCache(StaffCache.class);
+
+        if (cache.contains(player.getUniqueId()) && cache.get(player.getUniqueId()) == StaffStatus.DISPLAY_WRITE_CHAT) {
 
             event.setCancelled(true);
 
