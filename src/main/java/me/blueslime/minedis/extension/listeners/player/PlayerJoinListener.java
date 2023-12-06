@@ -6,6 +6,7 @@ import me.blueslime.minedis.extension.utils.StaffStatus;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 
 public class PlayerJoinListener implements Listener {
     private final MStaffChat main;
@@ -14,13 +15,13 @@ public class PlayerJoinListener implements Listener {
         this.main = main;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void on(PostLoginEvent event) {
         String permission = main.getConfiguration().getString("settings.command.permission", "minedis.staffchat.use");
         if (event.getPlayer().hasPermission(permission)) {
             main.getCache(StaffCache.class).set(
-                    event.getPlayer().getUniqueId(),
-                    StaffStatus.DISPLAY_CHAT
+                event.getPlayer().getUniqueId(),
+                StaffStatus.DISPLAY_CHAT
             );
         }
     }

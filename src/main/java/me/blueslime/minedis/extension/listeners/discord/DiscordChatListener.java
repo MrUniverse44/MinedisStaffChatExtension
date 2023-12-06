@@ -40,6 +40,10 @@ public class DiscordChatListener extends ListenerAdapter {
 
             Member member = event.getMember();
 
+            if (event.getAuthor().isBot()) {
+                return;
+            }
+
             if (channel.getId().equals(selectedChannel)) {
                 String format = settings.getString(
                     "settings.formats.minecraft",
