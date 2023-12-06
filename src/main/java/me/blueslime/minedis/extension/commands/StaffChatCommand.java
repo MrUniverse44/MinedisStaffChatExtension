@@ -206,7 +206,7 @@ public class StaffChatCommand extends MinecraftCommand {
             } else {
                 StaffCache cache = main.getCache(StaffCache.class);
 
-                boolean contains = cache.contains(player.getUniqueId()) && StaffStatus.isDisplay(cache.get(player.getUniqueId()));
+                boolean contains = cache.contains(player.getUniqueId()) && cache.get(player.getUniqueId()) == StaffStatus.DISPLAY_WRITE_CHAT;
 
                 String path = contains ?
                         "messages.auto-chat.disabled" :
