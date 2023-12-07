@@ -1,10 +1,10 @@
-package me.blueslime.minedis.extension.commands;
+package me.blueslime.minedis.extension.staffchat.commands;
 
 import me.blueslime.minedis.api.command.MinecraftCommand;
 import me.blueslime.minedis.api.command.sender.Sender;
-import me.blueslime.minedis.extension.MStaffChat;
-import me.blueslime.minedis.extension.cache.StaffCache;
-import me.blueslime.minedis.extension.utils.StaffStatus;
+import me.blueslime.minedis.extension.staffchat.MStaffChat;
+import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
+import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
 import me.blueslime.minedis.modules.discord.Controller;
 import me.blueslime.minedis.utils.text.TextUtilities;
 import net.dv8tion.jda.api.entities.Guild;

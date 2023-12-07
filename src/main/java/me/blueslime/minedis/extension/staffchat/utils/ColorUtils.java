@@ -1,4 +1,4 @@
-package me.blueslime.minedis.extension.utils;
+package me.blueslime.minedis.extension.staffchat.utils;
 
 import java.awt.*;
 import java.util.Locale;

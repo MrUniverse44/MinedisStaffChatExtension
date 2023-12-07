@@ -1,7 +1,7 @@
-package me.blueslime.minedis.extension.listeners.player;
+package me.blueslime.minedis.extension.staffchat.listeners.player;
 
-import me.blueslime.minedis.extension.MStaffChat;
-import me.blueslime.minedis.extension.cache.StaffCache;
+import me.blueslime.minedis.extension.staffchat.MStaffChat;
+import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;

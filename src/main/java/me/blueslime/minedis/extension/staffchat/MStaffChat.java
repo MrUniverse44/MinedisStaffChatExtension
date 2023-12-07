@@ -1,13 +1,13 @@
-package me.blueslime.minedis.extension;
+package me.blueslime.minedis.extension.staffchat;
 
 import me.blueslime.minedis.api.extension.MinedisExtension;
-import me.blueslime.minedis.extension.cache.StaffCache;
-import me.blueslime.minedis.extension.commands.StaffChatCommand;
-import me.blueslime.minedis.extension.listeners.discord.DiscordChatListener;
-import me.blueslime.minedis.extension.listeners.player.PlayerChatListener;
-import me.blueslime.minedis.extension.listeners.player.PlayerJoinListener;
-import me.blueslime.minedis.extension.listeners.player.PlayerQuitListener;
-import me.blueslime.minedis.extension.utils.ColorUtils;
+import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
+import me.blueslime.minedis.extension.staffchat.commands.StaffChatCommand;
+import me.blueslime.minedis.extension.staffchat.listeners.discord.DiscordChatListener;
+import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerChatListener;
+import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerJoinListener;
+import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerQuitListener;
+import me.blueslime.minedis.extension.staffchat.utils.ColorUtils;
 import me.blueslime.minedis.utils.text.TextUtilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;

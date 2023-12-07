@@ -1,4 +1,4 @@
-package me.blueslime.minedis.extension.utils;
+package me.blueslime.minedis.extension.staffchat.utils;
 
 public enum StaffStatus {
     DISPLAY_WRITE_CHAT,

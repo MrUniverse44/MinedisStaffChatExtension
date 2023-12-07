@@ -1,6 +1,6 @@
-package me.blueslime.minedis.extension.cache;
+package me.blueslime.minedis.extension.staffchat.cache;
 
-import me.blueslime.minedis.extension.utils.StaffStatus;
+import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
 import me.blueslime.minedis.modules.cache.Cache;
 
 import java.util.Map;

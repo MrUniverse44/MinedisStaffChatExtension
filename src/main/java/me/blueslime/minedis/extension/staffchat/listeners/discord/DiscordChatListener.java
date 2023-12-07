@@ -1,8 +1,8 @@
-package me.blueslime.minedis.extension.listeners.discord;
+package me.blueslime.minedis.extension.staffchat.listeners.discord;
 
-import me.blueslime.minedis.extension.MStaffChat;
-import me.blueslime.minedis.extension.cache.StaffCache;
-import me.blueslime.minedis.extension.utils.StaffStatus;
+import me.blueslime.minedis.extension.staffchat.MStaffChat;
+import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
+import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
 import me.blueslime.minedis.utils.text.TextUtilities;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
