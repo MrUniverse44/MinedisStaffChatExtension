@@ -3,8 +3,10 @@ package me.blueslime.minedis.extension.staffchat.listeners.player;
 import me.blueslime.minedis.Minedis;
 import me.blueslime.minedis.extension.staffchat.MStaffChat;
 import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
+import me.blueslime.minedis.extension.staffchat.utils.EmbedSection;
 import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
 import me.blueslime.minedis.modules.discord.Controller;
+import me.blueslime.minedis.utils.text.TextReplacer;
 import me.blueslime.minedis.utils.text.TextUtilities;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -80,47 +82,7 @@ public class PlayerChatListener implements Listener {
                             "server-name." + player.getServer().getInfo().getName(), player.getServer().getInfo().getName()
                     ) : player.getServer().getInfo().getName();
 
-            if (main.isEmbed()) {
-                MessageEmbed embed = main.getEmbedConfiguration().build(
-                        main,
-                        event
-                );
-
-                if (textChannel != null && embed != null) {
-                    textChannel.sendMessageEmbeds(embed).queue();
-                }
-            } else {
-                String defFormat = main.getConfiguration().getString(
-                    "settings.formats.discord.without-embed.message", "(**%location%** %nick%): %message%"
-                ).replace(
-                    "%location%",
-                    name
-                ).replace(
-                    "%player%", player.getName()
-                ).replace(
-                    "%nick%", player.getName()
-                ).replace(
-                    "%displayname%", player.getDisplayName()
-                ).replace(
-                    "%display_name%", player.getDisplayName()
-                ).replace(
-                    "%server%", name
-                ).replace(
-                    "%location%", name
-                ).replace(
-                    "%chat%", TextUtilities.strip(message)
-                ).replace(
-                    "%message%", TextUtilities.strip(message)
-                );
-
-                if (textChannel != null) {
-                    textChannel.sendMessage(defFormat).queue();
-                }
-            }
-
-            String format = main.getConfiguration().getString(
-                "settings.formats.minecraft", "&4[&cStaff&4]&c&l %location% &f%nick% &8» &7%message%"
-            ).replace(
+            TextReplacer replacer = TextReplacer.builder().replace(
                 "%location%",
                 name
             ).replace(
@@ -136,13 +98,44 @@ public class PlayerChatListener implements Listener {
             ).replace(
                 "%location%", name
             ).replace(
+                "%chat%", TextUtilities.strip(message)
+            ).replace(
+                "%message%", TextUtilities.strip(message)
+            );
+
+            if (main.isEmbed()) {
+
+                MessageEmbed embed = new EmbedSection(
+                        main.getConfiguration().getSection("settings.formats.discord.with-embed")
+                ).build(
+                    replacer
+                );
+
+                if (textChannel != null && embed != null) {
+                    textChannel.sendMessageEmbeds(embed).queue();
+                }
+            } else {
+                String defFormat = main.getConfiguration().getString(
+                    "settings.formats.discord.without-embed.message", "(**%location%** %nick%): %message%"
+                );
+
+                if (textChannel != null) {
+                    textChannel.sendMessage(
+                        replacer.apply(defFormat)
+                    ).queue();
+                }
+            }
+
+            String format = main.getConfiguration().getString(
+                "settings.formats.minecraft", "&4[&cStaff&4]&c&l %location% &f%nick% &8» &7%message%"
+            ).replace(
                 "%chat%", message
             ).replace(
                 "%message%", message
             );
 
             TextComponent component = TextUtilities.component(
-                format
+                replacer.apply(format)
             );
 
             main.getPlugin().getProxy().getConsole().sendMessage(

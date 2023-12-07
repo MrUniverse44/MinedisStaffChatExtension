@@ -7,14 +7,7 @@ import me.blueslime.minedis.extension.staffchat.listeners.discord.DiscordChatLis
 import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerChatListener;
 import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerJoinListener;
 import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerQuitListener;
-import me.blueslime.minedis.extension.staffchat.utils.ColorUtils;
-import me.blueslime.minedis.utils.text.TextUtilities;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.ChatEvent;
 
-import java.awt.*;
 import java.util.HashMap;
 
 public final class MStaffChat extends MinedisExtension {
@@ -28,7 +21,6 @@ public final class MStaffChat extends MinedisExtension {
     public String getName() {
         return "Minedis StaffChat";
     }
-    private EmbedTemplate template;
 
     @Override
     public void onEnabled() {
@@ -100,13 +92,6 @@ public final class MStaffChat extends MinedisExtension {
             cache
         );
 
-        template = new EmbedTemplate(
-            getConfiguration().getString("settings.formats.discord.with-embed.title", "SpigotMC"),
-            getConfiguration().getString("settings.formats.discord.with-embed.description", "(%location% %nick%): %message%"),
-            getConfiguration().getString("settings.formats.discord.with-embed.footer", "mc.spigotmc.org"),
-            getConfiguration().getString("settings.formats.discord.with-embed.color", "YELLOW")
-        );
-
         registerMinecraftCommand(
             new StaffChatCommand(
                 this,
@@ -120,132 +105,9 @@ public final class MStaffChat extends MinedisExtension {
     @Override
     public void onDisable() {
         getLogger().info("All listeners are unloaded from MStaffChat");
-
-        template = null;
     }
 
     public boolean isEmbed() {
         return getConfiguration().getBoolean("settings.formats.discord.with-embed.enabled", false);
-    }
-
-    public EmbedTemplate getEmbedConfiguration() {
-        return template;
-    }
-
-    public static class EmbedTemplate {
-
-        private final String description;
-        private final String footer;
-        private final String title;
-        private final Color color;
-
-        public EmbedTemplate(String title, String description, String footer, Color color) {
-            this.description = description;
-            this.footer = footer;
-            this.title = title;
-            this.color = color;
-        }
-
-        public EmbedTemplate(String title, String description, String footer, String color) {
-            this(
-                title,
-                description,
-                footer,
-                ColorUtils.getColor(color)
-            );
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getFooter() {
-            return footer;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public Color getColor() {
-            return color;
-        }
-
-        public MessageEmbed build(MStaffChat chat, ProxiedPlayer player, String message) {
-            String server = chat.getConfiguration().contains("server-name." + player.getServer().getInfo().getName())
-                ? chat.getConfiguration().getString(
-                    "server-name." + player.getServer().getInfo().getName(),
-                    player.getServer().getInfo().getName())
-                : player.getServer().getInfo().getName();
-
-            return new EmbedBuilder().setTitle(
-                getTitle().replace(
-                        "%player%", player.getName()
-                ).replace(
-                        "%nick%", player.getName()
-                ).replace(
-                        "%displayname%", player.getDisplayName()
-                ).replace(
-                        "%display_name%", player.getDisplayName()
-                ).replace(
-                        "%server%", server
-                ).replace(
-                        "%location%", server
-                ).replace(
-                        "%chat%", TextUtilities.strip(message)
-                ).replace(
-                        "%message%", TextUtilities.strip(message)
-                )
-            ).setColor(
-                getColor()
-            ).setFooter(
-                getFooter().replace(
-                        "%player%", player.getName()
-                ).replace(
-                        "%nick%", player.getName()
-                ).replace(
-                        "%displayname%", player.getDisplayName()
-                ).replace(
-                        "%display_name%", player.getDisplayName()
-                ).replace(
-                        "%server%", server
-                ).replace(
-                        "%location%", server
-                ).replace(
-                        "%chat%", message
-                ).replace(
-                        "%message%", message
-                )
-            ).setDescription(
-                getDescription().replace(
-                        "%player%", player.getName()
-                ).replace(
-                        "%nick%", player.getName()
-                ).replace(
-                        "%displayname%", player.getDisplayName()
-                ).replace(
-                        "%display_name%", player.getDisplayName()
-                ).replace(
-                        "%server%", server
-                ).replace(
-                        "%location%", server
-                ).replace(
-                        "%chat%", message
-                ).replace(
-                        "%message%", message
-                )
-            ).build();
-        }
-
-        public MessageEmbed build(MStaffChat chat, ChatEvent event) {
-            if (!(event.getSender() instanceof ProxiedPlayer)) {
-                return null;
-            }
-            return build(
-                    chat,
-                    (ProxiedPlayer)event.getSender(),
-                    event.getMessage()
-            );
-        }
     }
 }

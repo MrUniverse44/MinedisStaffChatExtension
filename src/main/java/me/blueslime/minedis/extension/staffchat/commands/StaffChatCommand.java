@@ -4,8 +4,10 @@ import me.blueslime.minedis.api.command.MinecraftCommand;
 import me.blueslime.minedis.api.command.sender.Sender;
 import me.blueslime.minedis.extension.staffchat.MStaffChat;
 import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
+import me.blueslime.minedis.extension.staffchat.utils.EmbedSection;
 import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
 import me.blueslime.minedis.modules.discord.Controller;
+import me.blueslime.minedis.utils.text.TextReplacer;
 import me.blueslime.minedis.utils.text.TextUtilities;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -167,11 +169,32 @@ public class StaffChatCommand extends MinecraftCommand {
                     return;
                 }
 
+                TextReplacer replacer = TextReplacer.builder().replace(
+                    "%location%",
+                    server
+                ).replace(
+                    "%player%", player.getName()
+                ).replace(
+                    "%nick%", player.getName()
+                ).replace(
+                    "%displayname%", player.getDisplayName()
+                ).replace(
+                    "%display_name%", player.getDisplayName()
+                ).replace(
+                    "%server%", server
+                ).replace(
+                    "%location%", server
+                ).replace(
+                    "%chat%", TextUtilities.strip(builder.toString())
+                ).replace(
+                    "%message%", TextUtilities.strip(builder.toString())
+                );
+
                 if (main.isEmbed()) {
-                    MessageEmbed embed = main.getEmbedConfiguration().build(
-                            main,
-                            player,
-                            builder.toString()
+                    MessageEmbed embed = new EmbedSection(
+                            main.getConfiguration().getSection("settings.formats.discord.with-embed")
+                    ).build(
+                        replacer
                     );
 
                     if (embed != null) {
@@ -180,28 +203,11 @@ public class StaffChatCommand extends MinecraftCommand {
                 } else {
                     String defFormat = main.getConfiguration().getString(
                             "settings.formats.discord.without-embed.message", "(**%location%** %nick%): %message%"
-                    ).replace(
-                            "%location%",
-                            server
-                    ).replace(
-                            "%player%", player.getName()
-                    ).replace(
-                            "%nick%", player.getName()
-                    ).replace(
-                            "%displayname%", player.getDisplayName()
-                    ).replace(
-                            "%display_name%", player.getDisplayName()
-                    ).replace(
-                            "%server%", server
-                    ).replace(
-                            "%location%", server
-                    ).replace(
-                            "%chat%", TextUtilities.strip(builder.toString())
-                    ).replace(
-                            "%message%", TextUtilities.strip(builder.toString())
                     );
 
-                    textChannel.sendMessage(defFormat).queue();
+                    textChannel.sendMessage(
+                            replacer.apply(defFormat)
+                    ).queue();
                 }
             } else {
                 StaffCache cache = main.getCache(StaffCache.class);
