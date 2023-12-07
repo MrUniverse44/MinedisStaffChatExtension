@@ -69,6 +69,7 @@ public final class MStaffChat extends MinedisExtension {
             getConfiguration().set("settings.formats.discord.with-embed.title", "SpigotMC");
             getConfiguration().set("settings.formats.discord.with-embed.description", "(%location% %nick%): %message%");
             getConfiguration().set("settings.formats.discord.with-embed.color", "YELLOW");
+            getConfiguration().set("settings.formats.discord.with-embed.thumbnail", "https://cravatar.eu/avatar/%nick%.png");
             getConfiguration().set("settings.formats.discord.with-embed.footer", "mc.spigotmc.org");
         }
 
