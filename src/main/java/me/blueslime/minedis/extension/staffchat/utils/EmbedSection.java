@@ -6,9 +6,12 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.md_5.bungee.config.Configuration;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EmbedSection {
     private static final TextReplacer EMPTY = TextReplacer.builder();
+    private final List<EmbedField> fieldList = new ArrayList<>();
     private String description = "";
     private String thumbnail = null;
     private String footer = null;
@@ -48,6 +51,18 @@ public class EmbedSection {
         if (configuration.contains("url")) {
             url = configuration.getString("url", "");
         }
+
+        if (configuration.contains("fields")) {
+            for (String key : configuration.getSection("fields").getKeys()) {
+                fieldList.add(
+                        new EmbedField(
+                                configuration.getBoolean("fields." + key + ".inline", true),
+                                configuration.getString("fields." + key + ".name", " "),
+                                configuration.getString("fields." + key + ".value", " ")
+                        )
+                );
+            }
+        }
     }
 
     public MessageEmbed build() {
@@ -85,6 +100,16 @@ public class EmbedSection {
                 builder.setFooter(
                     replacer.apply(split[0]),
                     replacer.apply(split[1])
+                );
+            }
+        }
+
+        if (!fieldList.isEmpty()) {
+            for (EmbedField field : fieldList) {
+                builder.addField(
+                        replacer.apply(field.getName()),
+                        replacer.apply(field.getValue()),
+                        field.isInline()
                 );
             }
         }
@@ -138,5 +163,30 @@ public class EmbedSection {
         }
 
         return builder.build();
+    }
+
+    public static class EmbedField {
+
+        private final boolean inline;
+        private final String value;
+        private final String name;
+
+        public EmbedField(boolean inline, String name, String value) {
+            this.inline = inline;
+            this.value = value;
+            this.name = name;
+        }
+
+        public boolean isInline() {
+            return inline;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 }
