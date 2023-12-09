@@ -80,6 +80,12 @@
         </dependency>
         <dependency>
             <groupId>com.github.MrUniverse44</groupId>
+            <artifactId>MinedisStaffAuthenticatorExtension</artifactId>
+            <version>1.0.0-PRE-1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.MrUniverse44</groupId>
             <artifactId>Minedis</artifactId>
             <version>1.0.0-RC-2</version>
             <scope>provided</scope>

@@ -5,8 +5,10 @@ import me.blueslime.minedis.api.command.sender.Sender;
 import me.blueslime.minedis.extension.staffchat.MStaffChat;
 import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
 import me.blueslime.minedis.extension.staffchat.utils.EmbedSection;
+import me.blueslime.minedis.extension.staffchat.utils.StaffAuthenticator;
 import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
 import me.blueslime.minedis.modules.discord.Controller;
+import me.blueslime.minedis.modules.extensions.Extensions;
 import me.blueslime.minedis.utils.text.TextReplacer;
 import me.blueslime.minedis.utils.text.TextUtilities;
 import net.dv8tion.jda.api.entities.Guild;
@@ -36,6 +38,15 @@ public class StaffChatCommand extends MinecraftCommand {
         String permission = main.getConfiguration().getString("settings.command.permission", "minedis.staffchat.use");
         if (sender.isPlayer() && sender.hasPermission(permission)) {
             ProxiedPlayer player = sender.toPlayer();
+
+            boolean staffExtension = main.getModule(Extensions.class).isExtensionInstalled("MStaffAuthenticator");
+
+            if (staffExtension) {
+                if (StaffAuthenticator.contains(main, player)) {
+                    return;
+                }
+            }
+
             if (args.length != 0) {
                 if (args[0].equalsIgnoreCase("toggle-chat") || args[0].equalsIgnoreCase("chat")) {
                     if (args.length >= 2) {
@@ -129,6 +140,11 @@ public class StaffChatCommand extends MinecraftCommand {
                     ProxiedPlayer proxied = proxy.getPlayer(entry.getKey());
 
                     if (proxied != null && proxied.isConnected()) {
+                        if (staffExtension) {
+                            if (StaffAuthenticator.contains(main, proxied)) {
+                                return;
+                            }
+                        }
                         if (StaffStatus.isDisplay(entry.getValue())) {
                             proxied.sendMessage(component);
                         } else {

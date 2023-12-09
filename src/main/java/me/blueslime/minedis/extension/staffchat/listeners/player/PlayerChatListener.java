@@ -4,8 +4,10 @@ import me.blueslime.minedis.Minedis;
 import me.blueslime.minedis.extension.staffchat.MStaffChat;
 import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
 import me.blueslime.minedis.extension.staffchat.utils.EmbedSection;
+import me.blueslime.minedis.extension.staffchat.utils.StaffAuthenticator;
 import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
 import me.blueslime.minedis.modules.discord.Controller;
+import me.blueslime.minedis.modules.extensions.Extensions;
 import me.blueslime.minedis.utils.text.TextReplacer;
 import me.blueslime.minedis.utils.text.TextUtilities;
 import net.dv8tion.jda.api.entities.Guild;
@@ -66,6 +68,14 @@ public class PlayerChatListener implements Listener {
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
 
         StaffCache cache = main.getCache(StaffCache.class);
+
+        boolean staffExtension = main.getModule(Extensions.class).isExtensionInstalled("MStaffAuthenticator");
+
+        if (staffExtension) {
+            if (StaffAuthenticator.contains(main, player)) {
+                return;
+            }
+        }
 
         if (cache.contains(player.getUniqueId()) && cache.get(player.getUniqueId()) == StaffStatus.DISPLAY_WRITE_CHAT) {
 
@@ -152,6 +162,11 @@ public class PlayerChatListener implements Listener {
                 ProxiedPlayer proxied = server.getPlayer(entry.getKey());
 
                 if (proxied != null && proxied.isConnected()) {
+                    if (staffExtension) {
+                        if (StaffAuthenticator.contains(main, proxied)) {
+                            continue;
+                        }
+                    }
                     if (StaffStatus.isDisplay(entry.getValue())) {
                         proxied.sendMessage(component);
                     } else {
