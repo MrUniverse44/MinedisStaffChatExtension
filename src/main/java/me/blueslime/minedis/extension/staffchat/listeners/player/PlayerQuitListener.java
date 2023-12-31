@@ -1,7 +1,6 @@
 package me.blueslime.minedis.extension.staffchat.listeners.player;
 
 import me.blueslime.minedis.extension.staffchat.MStaffChat;
-import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -16,7 +15,7 @@ public class PlayerQuitListener implements Listener {
     @EventHandler
     public void on(PlayerDisconnectEvent event) {
         main.getCache(
-            StaffCache.class
+            "msc-cache"
         ).remove(
             event.getPlayer().getUniqueId()
         );

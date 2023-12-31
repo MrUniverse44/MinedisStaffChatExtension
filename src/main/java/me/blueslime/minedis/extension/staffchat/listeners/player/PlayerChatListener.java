@@ -2,10 +2,10 @@ package me.blueslime.minedis.extension.staffchat.listeners.player;
 
 import me.blueslime.minedis.Minedis;
 import me.blueslime.minedis.extension.staffchat.MStaffChat;
-import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
 import me.blueslime.minedis.extension.staffchat.utils.EmbedSection;
 import me.blueslime.minedis.extension.staffchat.utils.StaffAuthenticator;
 import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
+import me.blueslime.minedis.modules.cache.Cache;
 import me.blueslime.minedis.modules.discord.Controller;
 import me.blueslime.minedis.modules.extensions.Extensions;
 import me.blueslime.minedis.utils.text.TextReplacer;
@@ -67,7 +67,7 @@ public class PlayerChatListener implements Listener {
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
 
-        StaffCache cache = main.getCache(StaffCache.class);
+        Cache<UUID, StaffStatus> cache = main.getCache("msc-cache");
 
         boolean staffExtension = main.getModule(Extensions.class).isExtensionInstalled("MStaffAuthenticator");
 
@@ -158,7 +158,7 @@ public class PlayerChatListener implements Listener {
                 main.getConfiguration().getString("settings.silent-bar.message", "&e+1 message in staff chat")
             );
 
-            for (Map.Entry<UUID, StaffStatus> entry : main.getCache(StaffCache.class).entrySet()) {
+            for (Map.Entry<UUID, StaffStatus> entry : cache.entrySet()) {
                 ProxiedPlayer proxied = server.getPlayer(entry.getKey());
 
                 if (proxied != null && proxied.isConnected()) {

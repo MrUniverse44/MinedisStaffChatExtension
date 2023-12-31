@@ -1,17 +1,19 @@
 package me.blueslime.minedis.extension.staffchat;
 
 import me.blueslime.minedis.api.extension.MinedisExtension;
-import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
 import me.blueslime.minedis.extension.staffchat.commands.StaffChatCommand;
 import me.blueslime.minedis.extension.staffchat.listeners.discord.DiscordChatListener;
 import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerChatListener;
 import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerJoinListener;
 import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerQuitListener;
+import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
+import me.blueslime.minedis.modules.cache.Cache;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public final class MStaffChat extends MinedisExtension {
-    private final StaffCache cache = new StaffCache(new HashMap<>());
+    private final Cache<UUID, StaffStatus> cache = new Cache<>(new HashMap<>());
     @Override
     public String getIdentifier() {
         return "MStaffChat";
@@ -90,6 +92,7 @@ public final class MStaffChat extends MinedisExtension {
         );
 
         registerCache(
+            "msc-cache",
             cache
         );
 

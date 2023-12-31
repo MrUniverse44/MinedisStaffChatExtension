@@ -1,8 +1,8 @@
 package me.blueslime.minedis.extension.staffchat.listeners.discord;
 
 import me.blueslime.minedis.extension.staffchat.MStaffChat;
-import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
 import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
+import me.blueslime.minedis.modules.cache.Cache;
 import me.blueslime.minedis.utils.text.TextUtilities;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -85,7 +85,9 @@ public class DiscordChatListener extends ListenerAdapter {
 
                 ProxyServer server = main.getPlugin().getProxy();
 
-                for (Map.Entry<UUID, StaffStatus> entry : main.getCache(StaffCache.class).entrySet()) {
+                Cache<UUID, StaffStatus> cache = main.getCache("msc-cache");
+
+                for (Map.Entry<UUID, StaffStatus> entry : cache.entrySet()) {
                     ProxiedPlayer proxied = server.getPlayer(entry.getKey());
 
                     if (proxied != null && proxied.isConnected()) {

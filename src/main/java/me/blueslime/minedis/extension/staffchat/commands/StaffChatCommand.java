@@ -3,10 +3,10 @@ package me.blueslime.minedis.extension.staffchat.commands;
 import me.blueslime.minedis.api.command.MinecraftCommand;
 import me.blueslime.minedis.api.command.sender.Sender;
 import me.blueslime.minedis.extension.staffchat.MStaffChat;
-import me.blueslime.minedis.extension.staffchat.cache.StaffCache;
 import me.blueslime.minedis.extension.staffchat.utils.EmbedSection;
 import me.blueslime.minedis.extension.staffchat.utils.StaffAuthenticator;
 import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
+import me.blueslime.minedis.modules.cache.Cache;
 import me.blueslime.minedis.modules.discord.Controller;
 import me.blueslime.minedis.modules.extensions.Extensions;
 import me.blueslime.minedis.utils.text.TextReplacer;
@@ -57,7 +57,7 @@ public class StaffChatCommand extends MinecraftCommand {
                         boolean status = Boolean.parseBoolean(check);
 
                         if (!status) {
-                            main.getCache(StaffCache.class).set(
+                            main.getCache("msc-cache").set(
                                     player.getUniqueId(),
                                     StaffStatus.DISABLED
                             );
@@ -67,7 +67,7 @@ public class StaffChatCommand extends MinecraftCommand {
                                     "&aStaff Chat has been disabled"
                             );
                         } else {
-                            main.getCache(StaffCache.class).set(
+                            main.getCache("msc-cache").set(
                                     player.getUniqueId(),
                                     StaffStatus.DISPLAY_WRITE_CHAT
                             );
@@ -136,7 +136,9 @@ public class StaffChatCommand extends MinecraftCommand {
 
                 ProxyServer proxy = main.getPlugin().getProxy();
 
-                for (Map.Entry<UUID, StaffStatus> entry : main.getCache(StaffCache.class).entrySet()) {
+                Cache<UUID, StaffStatus> cache = main.getCache("msc-cache");
+
+                for (Map.Entry<UUID, StaffStatus> entry : cache.entrySet()) {
                     ProxiedPlayer proxied = proxy.getPlayer(entry.getKey());
 
                     if (proxied != null && proxied.isConnected()) {
@@ -226,7 +228,7 @@ public class StaffChatCommand extends MinecraftCommand {
                     ).queue();
                 }
             } else {
-                StaffCache cache = main.getCache(StaffCache.class);
+                Cache<UUID, StaffStatus> cache = main.getCache("msc-cache");
 
                 boolean contains = cache.contains(player.getUniqueId()) && cache.get(player.getUniqueId()) == StaffStatus.DISPLAY_WRITE_CHAT;
 
@@ -248,12 +250,12 @@ public class StaffChatCommand extends MinecraftCommand {
                 );
 
                 if (contains) {
-                    main.getCache(StaffCache.class).set(
+                    main.getCache("msc-cache").set(
                         player.getUniqueId(),
                         StaffStatus.DISPLAY_CHAT
                     );
                 } else {
-                    main.getCache(StaffCache.class).set(
+                    main.getCache("msc-cache").set(
                         player.getUniqueId(),
                         StaffStatus.DISPLAY_WRITE_CHAT
                     );
