@@ -13,7 +13,9 @@ import me.blueslime.minedis.utils.text.TextReplacer;
 import me.blueslime.minedis.utils.text.TextUtilities;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -179,12 +181,22 @@ public class StaffChatCommand extends MinecraftCommand {
                     return;
                 }
 
+                StandardGuildMessageChannel channel;
+
                 TextChannel textChannel = guild.getTextChannelById(
-                        channelID
+                    channelID
                 );
 
                 if (textChannel == null) {
-                    return;
+                    NewsChannel newsChannel = guild.getNewsChannelById(
+                        channelID
+                    );
+                    if (newsChannel == null) {
+                        return;
+                    }
+                    channel = newsChannel;
+                } else {
+                    channel = textChannel;
                 }
 
                 TextReplacer replacer = TextReplacer.builder().replace(
@@ -216,14 +228,14 @@ public class StaffChatCommand extends MinecraftCommand {
                     );
 
                     if (embed != null) {
-                        textChannel.sendMessageEmbeds(embed).queue();
+                        channel.sendMessageEmbeds(embed).queue();
                     }
                 } else {
                     String defFormat = main.getConfiguration().getString(
                             "settings.formats.discord.without-embed.message", "(**%location%** %nick%): %message%"
                     );
 
-                    textChannel.sendMessage(
+                    channel.sendMessage(
                             replacer.apply(defFormat)
                     ).queue();
                 }
