@@ -9,6 +9,7 @@ import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
 import me.blueslime.minedis.modules.cache.Cache;
 import me.blueslime.minedis.modules.discord.Controller;
 import me.blueslime.minedis.modules.extensions.Extensions;
+import me.blueslime.minedis.utils.consumer.PluginConsumer;
 import me.blueslime.minedis.utils.text.TextReplacer;
 import me.blueslime.minedis.utils.text.TextUtilities;
 import net.dv8tion.jda.api.entities.Guild;
@@ -162,83 +163,88 @@ public class StaffChatCommand extends MinecraftCommand {
                     }
                 }
 
-                String guildID = main.getConfiguration().getString("settings.guild-id", "NOT_SET");
-                String channelID = main.getConfiguration().getString("settings.channel-id", "NOT_SET");
+                PluginConsumer.process(
+                    () -> {
+                        String guildID = main.getConfiguration().getString("settings.guild-id", "NOT_SET");
+                        String channelID = main.getConfiguration().getString("settings.channel-id", "NOT_SET");
 
-                if (guildID.isEmpty() || guildID.equalsIgnoreCase("NOT_SET")) {
-                    return;
-                }
+                        if (guildID.isEmpty() || guildID.equalsIgnoreCase("NOT_SET")) {
+                            return;
+                        }
 
-                if (channelID.isEmpty() || channelID.equalsIgnoreCase("NOT_SET")) {
-                    return;
-                }
+                        if (channelID.isEmpty() || channelID.equalsIgnoreCase("NOT_SET")) {
+                            return;
+                        }
 
-                Guild guild = main.getPlugin().getModule(Controller.class).getBot().getClient().getGuildById(
-                        guildID
+                        Guild guild = main.getPlugin().getModule(Controller.class).getBot().getClient().getGuildById(
+                                guildID
+                        );
+
+                        if (guild == null) {
+                            return;
+                        }
+
+                        StandardGuildMessageChannel channel;
+
+                        TextChannel textChannel = guild.getTextChannelById(
+                                channelID
+                        );
+
+                        if (textChannel == null) {
+                            NewsChannel newsChannel = guild.getNewsChannelById(
+                                    channelID
+                            );
+                            if (newsChannel == null) {
+                                return;
+                            }
+                            channel = newsChannel;
+                        } else {
+                            channel = textChannel;
+                        }
+
+                        TextReplacer replacer = TextReplacer.builder().replace(
+                                "%location%",
+                                server
+                        ).replace(
+                                "%player%", player.getName()
+                        ).replace(
+                                "%nick%", player.getName()
+                        ).replace(
+                                "%displayname%", player.getDisplayName()
+                        ).replace(
+                                "%display_name%", player.getDisplayName()
+                        ).replace(
+                                "%server%", server
+                        ).replace(
+                                "%location%", server
+                        ).replace(
+                                "%chat%", TextUtilities.strip(builder.toString())
+                        ).replace(
+                                "%message%", TextUtilities.strip(builder.toString())
+                        );
+
+                        if (main.isEmbed()) {
+                            MessageEmbed embed = new EmbedSection(
+                                    main.getConfiguration().getSection("settings.formats.discord.with-embed")
+                            ).build(
+                                    replacer
+                            );
+
+                            if (embed != null) {
+                                channel.sendMessageEmbeds(embed).queue();
+                            }
+                        } else {
+                            String defFormat = main.getConfiguration().getString(
+                                    "settings.formats.discord.without-embed.message", "(**%location%** %nick%): %message%"
+                            );
+
+                            channel.sendMessage(
+                                    replacer.apply(defFormat)
+                            ).queue();
+                        }
+                    },
+                    e -> player.sendMessage(TextUtilities.component("&cCan't deliver discord message due to bot connection issues."))
                 );
-
-                if (guild == null) {
-                    return;
-                }
-
-                StandardGuildMessageChannel channel;
-
-                TextChannel textChannel = guild.getTextChannelById(
-                    channelID
-                );
-
-                if (textChannel == null) {
-                    NewsChannel newsChannel = guild.getNewsChannelById(
-                        channelID
-                    );
-                    if (newsChannel == null) {
-                        return;
-                    }
-                    channel = newsChannel;
-                } else {
-                    channel = textChannel;
-                }
-
-                TextReplacer replacer = TextReplacer.builder().replace(
-                    "%location%",
-                    server
-                ).replace(
-                    "%player%", player.getName()
-                ).replace(
-                    "%nick%", player.getName()
-                ).replace(
-                    "%displayname%", player.getDisplayName()
-                ).replace(
-                    "%display_name%", player.getDisplayName()
-                ).replace(
-                    "%server%", server
-                ).replace(
-                    "%location%", server
-                ).replace(
-                    "%chat%", TextUtilities.strip(builder.toString())
-                ).replace(
-                    "%message%", TextUtilities.strip(builder.toString())
-                );
-
-                if (main.isEmbed()) {
-                    MessageEmbed embed = new EmbedSection(
-                            main.getConfiguration().getSection("settings.formats.discord.with-embed")
-                    ).build(
-                        replacer
-                    );
-
-                    if (embed != null) {
-                        channel.sendMessageEmbeds(embed).queue();
-                    }
-                } else {
-                    String defFormat = main.getConfiguration().getString(
-                            "settings.formats.discord.without-embed.message", "(**%location%** %nick%): %message%"
-                    );
-
-                    channel.sendMessage(
-                            replacer.apply(defFormat)
-                    ).queue();
-                }
             } else {
                 Cache<UUID, StaffStatus> cache = main.getCache("msc-cache");
 

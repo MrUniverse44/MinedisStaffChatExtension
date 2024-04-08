@@ -8,6 +8,7 @@ import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerJoinListe
 import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerQuitListener;
 import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
 import me.blueslime.minedis.modules.cache.Cache;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -104,6 +105,17 @@ public final class MStaffChat extends MinedisExtension {
         );
 
         getLogger().info("All listeners are loaded from MStaffChat");
+
+        String permission = getConfiguration().getString("settings.command.permission", "minedis.staffchat.use");
+
+        for (ProxiedPlayer onlinePlayer : getProxy().getPlayers()) {
+            if (onlinePlayer.hasPermission(permission)) {
+                getCache("msc-cache").set(
+                    onlinePlayer.getUniqueId(),
+                    StaffStatus.DISPLAY_CHAT
+                );
+            }
+        }
     }
 
     @Override
