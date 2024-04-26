@@ -5,13 +5,13 @@ public enum StaffStatus {
     DISPLAY_CHAT,
     DISABLED;
 
-    public static boolean isDisplay(StaffStatus value) {
+    public static boolean isDisplay(String value) {
         switch (value) {
-            case DISABLED:
+            case "disabled":
                 return false;
             default:
-            case DISPLAY_WRITE_CHAT:
-            case DISPLAY_CHAT:
+            case "display-write-chat":
+            case "display-chat":
                 return true;
         }
     }

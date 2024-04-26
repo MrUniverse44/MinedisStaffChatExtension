@@ -3,8 +3,6 @@ package me.blueslime.minedis.extension.staffchat.listeners.player;
 import me.blueslime.minedis.Minedis;
 import me.blueslime.minedis.extension.staffchat.MStaffChat;
 import me.blueslime.minedis.extension.staffchat.utils.EmbedSection;
-import me.blueslime.minedis.extension.staffchat.utils.StaffAuthenticator;
-import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
 import me.blueslime.minedis.modules.cache.Cache;
 import me.blueslime.minedis.modules.discord.Controller;
 import me.blueslime.minedis.modules.extensions.Extensions;
@@ -67,17 +65,17 @@ public class PlayerChatListener implements Listener {
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
 
-        Cache<UUID, StaffStatus> cache = main.getCache("msc-cache");
+        Cache<UUID, String> cache = main.getCache("msc-cache");
 
         boolean staffExtension = main.getModule(Extensions.class).isExtensionInstalled("MStaffAuthenticator");
 
         if (staffExtension) {
-            if (StaffAuthenticator.contains(main, player)) {
+            if (MStaffChat.contains(main, player)) {
                 return;
             }
         }
 
-        if (cache.contains(player.getUniqueId()) && cache.get(player.getUniqueId()) == StaffStatus.DISPLAY_WRITE_CHAT) {
+        if (cache.contains(player.getUniqueId()) && cache.get(player.getUniqueId()).equalsIgnoreCase("display-write-chat")) {
 
             event.setCancelled(true);
 
@@ -158,22 +156,22 @@ public class PlayerChatListener implements Listener {
                 main.getConfiguration().getString("settings.silent-bar.message", "&e+1 message in staff chat")
             );
 
-            for (Map.Entry<UUID, StaffStatus> entry : cache.entrySet()) {
+            for (Map.Entry<UUID, String> entry : cache.entrySet()) {
                 ProxiedPlayer proxied = server.getPlayer(entry.getKey());
 
                 if (proxied != null && proxied.isConnected()) {
                     if (staffExtension) {
-                        if (StaffAuthenticator.contains(main, proxied)) {
+                        if (MStaffChat.contains(main, proxied)) {
                             continue;
                         }
                     }
-                    if (StaffStatus.isDisplay(entry.getValue())) {
+                    if (MStaffChat.isDisplay(entry.getValue())) {
                         proxied.sendMessage(component);
                     } else {
                         if (silentBar) {
                             proxied.sendMessage(
-                                    ChatMessageType.ACTION_BAR,
-                                    silent
+                                ChatMessageType.ACTION_BAR,
+                                silent
                             );
                         }
                     }

@@ -4,8 +4,6 @@ import me.blueslime.minedis.api.command.MinecraftCommand;
 import me.blueslime.minedis.api.command.sender.Sender;
 import me.blueslime.minedis.extension.staffchat.MStaffChat;
 import me.blueslime.minedis.extension.staffchat.utils.EmbedSection;
-import me.blueslime.minedis.extension.staffchat.utils.StaffAuthenticator;
-import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
 import me.blueslime.minedis.modules.cache.Cache;
 import me.blueslime.minedis.modules.discord.Controller;
 import me.blueslime.minedis.modules.extensions.Extensions;
@@ -45,7 +43,7 @@ public class StaffChatCommand extends MinecraftCommand {
             boolean staffExtension = main.getModule(Extensions.class).isExtensionInstalled("MStaffAuthenticator");
 
             if (staffExtension) {
-                if (StaffAuthenticator.contains(main, player)) {
+                if (MStaffChat.contains(main, player)) {
                     return;
                 }
             }
@@ -61,23 +59,23 @@ public class StaffChatCommand extends MinecraftCommand {
 
                         if (!status) {
                             main.getCache("msc-cache").set(
-                                    player.getUniqueId(),
-                                    StaffStatus.DISABLED
+                                player.getUniqueId(),
+                                "disabled"
                             );
                             sender.send(
-                                    main.getConfiguration(),
-                                    "messages.chat-status.disabled",
-                                    "&aStaff Chat has been disabled"
+                                main.getConfiguration(),
+                                "messages.chat-status.disabled",
+                                "&aStaff Chat has been disabled"
                             );
                         } else {
                             main.getCache("msc-cache").set(
-                                    player.getUniqueId(),
-                                    StaffStatus.DISPLAY_WRITE_CHAT
+                                player.getUniqueId(),
+                                "display-write-chat"
                             );
                             sender.send(
-                                    main.getConfiguration(),
-                                    "messages.chat-status.enabled",
-                                    "&aStaff Chat has been enabled"
+                                main.getConfiguration(),
+                                "messages.chat-status.enabled",
+                                "&aStaff Chat has been enabled"
                             );
                         }
 
@@ -139,18 +137,18 @@ public class StaffChatCommand extends MinecraftCommand {
 
                 ProxyServer proxy = main.getPlugin().getProxy();
 
-                Cache<UUID, StaffStatus> cache = main.getCache("msc-cache");
+                Cache<UUID, String> cache = main.getCache("msc-cache");
 
-                for (Map.Entry<UUID, StaffStatus> entry : cache.entrySet()) {
+                for (Map.Entry<UUID, String> entry : cache.entrySet()) {
                     ProxiedPlayer proxied = proxy.getPlayer(entry.getKey());
 
                     if (proxied != null && proxied.isConnected()) {
                         if (staffExtension) {
-                            if (StaffAuthenticator.contains(main, proxied)) {
+                            if (MStaffChat.contains(main, proxied)) {
                                 return;
                             }
                         }
-                        if (StaffStatus.isDisplay(entry.getValue())) {
+                        if (MStaffChat.isDisplay(entry.getValue())) {
                             proxied.sendMessage(component);
                         } else {
                             if (silentBar) {
@@ -203,24 +201,24 @@ public class StaffChatCommand extends MinecraftCommand {
                         }
 
                         TextReplacer replacer = TextReplacer.builder().replace(
-                                "%location%",
-                                server
+                            "%location%",
+                            server
                         ).replace(
-                                "%player%", player.getName()
+                            "%player%", player.getName()
                         ).replace(
-                                "%nick%", player.getName()
+                            "%nick%", player.getName()
                         ).replace(
-                                "%displayname%", player.getDisplayName()
+                            "%displayname%", player.getDisplayName()
                         ).replace(
-                                "%display_name%", player.getDisplayName()
+                            "%display_name%", player.getDisplayName()
                         ).replace(
-                                "%server%", server
+                            "%server%", server
                         ).replace(
-                                "%location%", server
+                            "%location%", server
                         ).replace(
-                                "%chat%", TextUtilities.strip(builder.toString())
+                            "%chat%", TextUtilities.strip(builder.toString())
                         ).replace(
-                                "%message%", TextUtilities.strip(builder.toString())
+                            "%message%", TextUtilities.strip(builder.toString())
                         );
 
                         if (main.isEmbed()) {
@@ -246,9 +244,9 @@ public class StaffChatCommand extends MinecraftCommand {
                     e -> player.sendMessage(TextUtilities.component("&cCan't deliver discord message due to bot connection issues."))
                 );
             } else {
-                Cache<UUID, StaffStatus> cache = main.getCache("msc-cache");
+                Cache<UUID, String> cache = main.getCache("msc-cache");
 
-                boolean contains = cache.contains(player.getUniqueId()) && cache.get(player.getUniqueId()) == StaffStatus.DISPLAY_WRITE_CHAT;
+                boolean contains = cache.contains(player.getUniqueId()) && cache.get(player.getUniqueId()).equalsIgnoreCase("display-write-chat");
 
                 String path = contains ?
                         "messages.auto-chat.disabled" :
@@ -270,12 +268,12 @@ public class StaffChatCommand extends MinecraftCommand {
                 if (contains) {
                     main.getCache("msc-cache").set(
                         player.getUniqueId(),
-                        StaffStatus.DISPLAY_CHAT
+                        "display-chat"
                     );
                 } else {
                     main.getCache("msc-cache").set(
                         player.getUniqueId(),
-                        StaffStatus.DISPLAY_WRITE_CHAT
+                        "display-write-chat"
                     );
                 }
             }

@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public final class MStaffChat extends MinedisExtension {
-    private final Cache<UUID, StaffStatus> cache = new Cache<>(new HashMap<>());
+    private final Cache<UUID, String> cache = new Cache<>(new HashMap<>());
     @Override
     public String getIdentifier() {
         return "MStaffChat";
@@ -112,7 +112,7 @@ public final class MStaffChat extends MinedisExtension {
             if (onlinePlayer.hasPermission(permission)) {
                 getCache("msc-cache").set(
                     onlinePlayer.getUniqueId(),
-                    StaffStatus.DISPLAY_CHAT
+                    "display-chat"
                 );
             }
         }
@@ -125,5 +125,20 @@ public final class MStaffChat extends MinedisExtension {
 
     public boolean isEmbed() {
         return getConfiguration().getBoolean("settings.formats.discord.with-embed.enabled", false);
+    }
+
+    public static boolean isDisplay(String value) {
+        switch (value) {
+            case "disabled":
+                return false;
+            default:
+            case "display-write-chat":
+            case "display-chat":
+                return true;
+        }
+    }
+
+    public static boolean contains(MStaffChat main, ProxiedPlayer player) {
+        return main.getCache("mstaff-mc-codes").contains(player.getUniqueId());
     }
 }
