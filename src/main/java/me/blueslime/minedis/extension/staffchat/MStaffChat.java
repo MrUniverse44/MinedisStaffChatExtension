@@ -6,7 +6,6 @@ import me.blueslime.minedis.extension.staffchat.listeners.discord.DiscordChatLis
 import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerChatListener;
 import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerJoinListener;
 import me.blueslime.minedis.extension.staffchat.listeners.player.PlayerQuitListener;
-import me.blueslime.minedis.extension.staffchat.utils.StaffStatus;
 import me.blueslime.minedis.modules.cache.Cache;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
